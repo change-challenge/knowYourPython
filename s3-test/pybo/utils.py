@@ -2,6 +2,7 @@ import boto3
 import uuid
 from datetime import datetime
 from django.conf import settings
+from rest_framework import serializers
 
 def s3_file_upload_by_file_date(upload_file, bucket_path,
                                 content_type=None, extension=None):

@@ -1,11 +1,17 @@
+from django.core.serializers import serialize
+from django.db import transaction
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import generic
 from rest_framework.decorators import api_view
 from django.utils import timezone
 from django.http import HttpResponseNotAllowed, JsonResponse
-
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 from pybo.models import Question, Answer
+
 from .forms import QuestionForm, AnswerForm
+from .serializer import PresignedURLSerializer
 from .utils import s3_file_upload_by_file_date
 import logging
 
@@ -73,3 +79,15 @@ def upload_to_s3(request):
         return JsonResponse({'error': 'Failed to upload file'}, status=500)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+class PresignedURLView(APIView):
+    def post(self, request):
+        print("Request Data:", request.data)
+
+        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@ 이거 뭐냐 PresignedURLView")
+        serializer = PresignedURLSerializer(data=request.data)
+        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@ 이거 뭐냐 PresignedURLView22")
+        if serializer.is_valid():
+            return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
